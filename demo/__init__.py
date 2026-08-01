@@ -1,0 +1,2 @@
+"""Synthetic-only demonstration helpers."""
+

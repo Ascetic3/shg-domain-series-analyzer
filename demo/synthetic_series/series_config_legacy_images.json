@@ -1,0 +1,219 @@
+{
+  "input_dir": "legacy_images",
+  "output_dir": "../run_outputs_legacy",
+  "frame_width_um": 192.0,
+  "z_start_um": 0.0,
+  "z_step_um": 12.5,
+  "source_type": "legacy_images",
+  "direction": "increasing",
+  "txt_patterns": [
+    "*.txt"
+  ],
+  "image_patterns": [
+    "img_*.png",
+    "img_*.tif",
+    "img_*.tiff",
+    "*.png",
+    "*.tif",
+    "*.tiff"
+  ],
+  "export_preview_png": false,
+  "export_float_tiff": false,
+  "preview_low_percentile": 1.0,
+  "preview_high_percentile": 99.0,
+  "processing": {
+    "min_period_um": 25.0,
+    "boundary_frac": 0.5,
+    "min_band_width_um": 1.0,
+    "max_band_width_um": 18.0,
+    "profile_sigma_px": 3.0,
+    "min_dark_interval_width_um": 3.0,
+    "denoise_sigma_px": 0.8,
+    "background_sigma_px": 18.0,
+    "rotation_score_crop_fraction": 0.72,
+    "analysis_crop_fraction": 0.78,
+    "final_profile_sigma_px": 1.0,
+    "edge_ignore_fraction": 0.04,
+    "status_contrast_threshold": 0.08
+  },
+  "layers": [
+    {
+      "filename": "layer_001.png",
+      "source_path": "legacy_images/layer_001.png",
+      "layer_index": 0,
+      "z_um": 0.0,
+      "status": "Pending",
+      "source_number": 1,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 6.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    },
+    {
+      "filename": "layer_002.png",
+      "source_path": "legacy_images/layer_002.png",
+      "layer_index": 1,
+      "z_um": 12.5,
+      "status": "Pending",
+      "source_number": 2,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 6.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    },
+    {
+      "filename": "layer_003.png",
+      "source_path": "legacy_images/layer_003.png",
+      "layer_index": 2,
+      "z_um": 25.0,
+      "status": "Pending",
+      "source_number": 3,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 7.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    },
+    {
+      "filename": "layer_004.png",
+      "source_path": "legacy_images/layer_004.png",
+      "layer_index": 3,
+      "z_um": 37.5,
+      "status": "Pending",
+      "source_number": 4,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 7.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    },
+    {
+      "filename": "layer_005.png",
+      "source_path": "legacy_images/layer_005.png",
+      "layer_index": 4,
+      "z_um": 50.0,
+      "status": "Pending",
+      "source_number": 5,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 9.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    },
+    {
+      "filename": "layer_006.png",
+      "source_path": "legacy_images/layer_006.png",
+      "layer_index": 5,
+      "z_um": 62.5,
+      "status": "Pending",
+      "source_number": 6,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 7.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    },
+    {
+      "filename": "layer_007.png",
+      "source_path": "legacy_images/layer_007.png",
+      "layer_index": 6,
+      "z_um": 75.0,
+      "status": "Pending",
+      "source_number": 7,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 10.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    },
+    {
+      "filename": "layer_008.png",
+      "source_path": "legacy_images/layer_008.png",
+      "layer_index": 7,
+      "z_um": 87.5,
+      "status": "Pending",
+      "source_number": 8,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 9.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    },
+    {
+      "filename": "layer_009.png",
+      "source_path": "legacy_images/layer_009.png",
+      "layer_index": 8,
+      "z_um": 100.0,
+      "status": "Pending",
+      "source_number": 9,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 7.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    },
+    {
+      "filename": "layer_010.png",
+      "source_path": "legacy_images/layer_010.png",
+      "layer_index": 9,
+      "z_um": 112.5,
+      "status": "Pending",
+      "source_number": 10,
+      "matrix_shape": [
+        192,
+        192
+      ],
+      "source_min": 9.0,
+      "source_max": 255.0,
+      "import_status": "valid",
+      "import_error_type": "",
+      "import_error_message": ""
+    }
+  ],
+  "order_confirmed": true,
+  "scientific_warning": "The physical interpretation and scientific accuracy of the detector must be validated against expert annotation or an independent method.",
+  "coordinate_rule": {
+    "increasing": "z_i = z0 + layer_index * step",
+    "decreasing": "z_i = z0 - layer_index * step",
+    "internal_unit": "um"
+  },
+  "path_mode": "relative_to_config"
+}
