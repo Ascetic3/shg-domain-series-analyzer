@@ -4,7 +4,7 @@ import math
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtCore import Qt, QThread, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QImage, QKeySequence, QPixmap, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
@@ -937,12 +937,21 @@ class MainWindow(QMainWindow):
             self._set_file_preview(self.plot_preview, self.plot_combo.currentData(), (1120, 680))
 
 
-def main() -> int:
-    app = QApplication.instance() or QApplication(sys.argv)
+def main(argv: list[str] | None = None) -> int:
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    smoke_test = "--smoke-test" in arguments
+    qt_arguments = [sys.argv[0], *(argument for argument in arguments if argument != "--smoke-test")]
+    app = QApplication.instance() or QApplication(qt_arguments)
     app.setApplicationName("Bright-band series analyzer")
     window = MainWindow()
     window.show()
-    return app.exec()
+    if smoke_test:
+        QTimer.singleShot(250, app.quit)
+    exit_code = app.exec()
+    if smoke_test:
+        window.close()
+        app.processEvents()
+    return exit_code
 
 
 if __name__ == "__main__":

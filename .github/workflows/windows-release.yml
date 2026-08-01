@@ -1,0 +1,78 @@
+name: Windows release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-release:
+    runs-on: windows-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
+      MPLBACKEND: Agg
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Create build environment
+        shell: pwsh
+        run: |
+          python -m venv .venv
+          .\.venv\Scripts\python.exe -m pip install -e ".[test,build]"
+
+      - name: Run tests
+        shell: pwsh
+        run: .\.venv\Scripts\python.exe -m pytest
+
+      - name: Ensure Inno Setup is available
+        shell: pwsh
+        run: |
+          $iscc32 = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          $iscc64 = "C:\Program Files\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path -LiteralPath $iscc32) -and -not (Test-Path -LiteralPath $iscc64)) {
+            choco install innosetup --yes --no-progress
+          }
+
+      - name: Build installer and portable archive
+        shell: pwsh
+        run: powershell -ExecutionPolicy Bypass -File .\scripts\build_windows.ps1 -SkipDependencyInstall -SkipTests
+
+      - name: Smoke-test installer and portable application
+        shell: pwsh
+        run: powershell -ExecutionPolicy Bypass -File .\scripts\smoke_test_windows.ps1
+
+      - name: Upload Windows release files
+        uses: actions/upload-artifact@v4
+        with:
+          name: SHG-Series-Analyzer-0.1.0-Windows
+          if-no-files-found: error
+          path: |
+            release/SHG-Series-Analyzer-Setup-0.1.0.exe
+            release/SHG-Series-Analyzer-Portable-0.1.0.zip
+            release/SHA256SUMS.txt
+
+      - name: Create GitHub release for tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME `
+            release/SHG-Series-Analyzer-Setup-0.1.0.exe `
+            release/SHG-Series-Analyzer-Portable-0.1.0.zip `
+            release/SHA256SUMS.txt `
+            --repo $env:GITHUB_REPOSITORY `
+            --title "SHG Series Analyzer v0.1.0" `
+            --generate-notes

@@ -140,3 +140,7 @@ def test_viewer_preserves_aspect_ratio_and_fit_actual_are_safe(app: QApplication
     viewer.fit_to_window()
     assert viewer.transform().m11() == pytest.approx(viewer.transform().m22())
     viewer.close()
+
+
+def test_main_smoke_test_returns_zero(app: QApplication) -> None:
+    assert main_window_module.main(["--smoke-test"]) == 0

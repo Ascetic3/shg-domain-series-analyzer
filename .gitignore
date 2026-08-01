@@ -9,6 +9,12 @@ __pycache__/
 htmlcov/
 build/
 dist/
+release/
+*.spec.tmp
+*.iss.tmp
+*.exe
+*.msi
+*.zip
 *.egg-info/
 analysis_results/
 run_*/

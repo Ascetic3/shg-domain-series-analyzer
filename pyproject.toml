@@ -18,6 +18,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=8.0"]
+build = ["pyinstaller>=6"]
 
 [project.scripts]
 shg-domain-analyzer = "shg_domain_analyzer.gui.main_window:main"
