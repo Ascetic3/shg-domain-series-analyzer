@@ -1,199 +1,142 @@
-# Periodic bright-band series analyzer
+# SHG Bright-Band Series Analyzer
 
-This directory is a standalone, synthetic-data-only portfolio MVP. Its primary
-input is a folder of numeric TXT matrices. A legacy PNG/TIFF mode remains for
-already converted images. Both modes feed the same `analyze_array()` detector.
+A desktop Python application for importing floating-point TXT image series, assigning physical depth coordinates, detecting periodic bright bands, reviewing quality-control visualizations, and exporting reproducible measurements.
 
-> **Scientific warning:** The physical interpretation and scientific accuracy
-> of the detector must be validated against expert annotation or an independent
-> method.
+> **Scientific warning**
+>
+> The physical interpretation and scientific accuracy of the detector must be validated against expert annotation or an independent method.
 
-The application uses neutral terminology: detected bright bands, dark
-intervals between detected bands, candidate wall width, and candidate domain
-width. B1, B2, ... are left-to-right interval order inside one frame; they are
-not identities of physical objects between frames.
+## 1. Overview
 
-No real matrices, images, measurements, sample identifiers, experimental
-conditions, or legacy results are included in `portfolio_app`.
+The application imports an ordered series of two-dimensional numeric matrices, maps each filename to an explicit `layer_index` and depth coordinate `z`, runs one shared detector, and provides per-layer quality-control views and structured exports. Raw TXT matrices are the primary input. A legacy PNG/TIFF mode remains available for compatibility.
 
-## Source modes
+This repository is a technical portfolio release. Every included matrix, image, expected value, and screenshot is synthetic.
 
-### Raw TXT matrices (default)
+## 2. Portfolio case study
 
-Raw TXT mode analyzes the original floating-point matrices. Each complete file
-is decoded and every token is parsed to a rectangular NumPy `float64` array.
-That array is passed directly to `analyze_array()`. It is never converted to
-PNG or `uint8` before analysis. The preserved v6 `normalize_for_analysis()`
-function creates its existing float32 working copy internally.
+The original workflow depended on manual preparation of image files before measurement. This application moves source validation, ordering, coordinate assignment, analysis, quality control, and export into one reproducible desktop workflow.
 
-The inspected legacy data format is:
+The portfolio version demonstrates how the workflow was redesigned:
 
-- ASCII-compatible UTF-8 text without BOM;
-- CRLF row endings;
-- one space between columns;
-- decimal point;
-- no header or blank rows;
-- no leading or trailing whitespace;
-- numeric basenames, with both zero-padded and non-padded forms;
-- typical matrices are 300 × 300;
-- isolated 3 × 3 matrices occur and are treated as `invalid_shape`, without
-  resizing.
+- numeric TXT matrices are imported directly as floating-point arrays;
+- the user specifies the physical frame width, first depth, and spacing between layers;
+- preflight creates an explicit `filename → layer_index → z` table;
+- invalid, ragged, non-finite, or wrong-shape matrices are isolated and reported;
+- display previews are separate normalized copies and are never used as detector input;
+- an optional float TIFF stack is exported without contrast enhancement or 8-bit quantization;
+- the GUI provides source/QC review, an error report, and exploratory depth summaries;
+- synthetic regression tests verify software behavior and reproducibility.
 
-Because the inspected files contain only ASCII numeric syntax, a more specific
-national text encoding cannot be inferred from their bytes.
+## 3. Problem solved
 
-### PNG/TIFF images
+Series analysis is difficult to audit when file order, depth mapping, display conversion, measurement, and export are separate manual steps. The application makes those decisions explicit, validates them before processing, and records enough provenance to reproduce a run.
 
-Legacy image mode analyzes already converted image files. Pillow loads the
-image through the existing grayscale `float32` path. This mode exists for
-compatibility and is not the primary workflow.
+It does not claim that detected bright bands are proven physical domain walls or that separate physical domains are followed between layers.
 
-ImageJ/Fiji is not required by either mode.
+## 4. Main workflow
 
-## Architecture
+1. Select Raw TXT matrices or legacy images.
+2. Review natural filename ordering and import errors.
+3. Set frame width, first depth, layer spacing, and direction.
+4. Confirm any numbering gaps.
+5. Run the detector in a background worker.
+6. Review summary rows, source previews, QC plots, and exploratory depth plots.
+7. Export CSV tables, configuration, manifest, QC PNG files, and optional display/TIFF conversions.
 
-```text
-portfolio_app/
-├── src/shg_domain_analyzer/
-│   ├── models.py           configuration and result dataclasses
-│   ├── config.py           portable JSON and filename → layer → z mapping
-│   ├── image_io.py         strict TXT import, image import, preflight, hashing
-│   ├── processing.py       detector formulas modularized from v6
-│   ├── measurements.py     shared analyze_array() measurement core
-│   ├── visualization.py    display preview, QC, and depth plots
-│   ├── export.py           CSV, manifest, preview PNG, and float TIFF stack
-│   └── gui/
-│       ├── main_window.py  PySide6 source/import/result workflow
-│       └── worker.py       background execution and cancellation
-├── demo/
-│   ├── generate_synthetic_series.py
-│   ├── run_demo.py
-│   └── capture_gui_screenshots.py
-├── tests/
-├── screenshots/
-├── pyproject.toml
-└── run_gui.py
-```
+## 5. Key features
 
-## Shared analysis pipeline
+- strict rectangular TXT import to NumPy `float64`;
+- explicit filename, source number, `layer_index`, and `z` mapping;
+- synchronized Previous/Next and keyboard navigation across preview tabs;
+- 10–800% zoom, pan, Fit to window, 100%, and full-size QC window;
+- per-frame QC image plus normalized transverse profile;
+- OK/CHECK status shown with distinct visual treatment;
+- aggregate depth summary that breaks lines at CHECK layers;
+- per-depth dark-interval distribution with every observation, median, IQR, and `n`;
+- unique run directories and source-hash verification;
+- optional `float32` TIFF stack with `ZYX` axes;
+- background execution, cancellation between layers, and isolated error reporting.
 
-```text
-TXT file ── read_txt_matrix() ── float64 array ─┐
-                                                ├─ analyze_array()
-PNG/TIFF ── read_gray() ───────── float32 array ┘
-```
+## 6. Screenshots
 
-`analyze_array()` applies the unchanged detector stages:
+All screenshots below use the deterministic synthetic demo.
 
-1. `normalize_for_analysis()`;
-2. `find_best_rotation()`;
-3. `crop_center()` and `rotate_and_build_profile()`;
-4. `robust_profile_normalize()`;
-5. `detect_bright_walls()`;
-6. `build_black_domains()`;
-7. neutral measurements and `save_qc_plot()`.
+### Series setup and explicit depth mapping
 
-The formulas and default thresholds from v6 were not intentionally changed.
-Software-level additions include source validation, explicit metadata, portable
-configuration, error isolation, exports, and the worker-thread GUI.
+![Synthetic TXT setup with layer index and depth](docs/images/series_setup.png)
 
-## Raw data, display preview, and QC
+### Floating-point source preview
 
-Three representations are deliberately separate:
+![Raw floating-point source preview with layer navigation](docs/images/source_preview.png)
 
-1. **Raw data** — the source `float64` TXT matrix used by `analyze_array()`.
-2. **Display preview** — a new `uint8` copy made by linear 1st/99th percentile
-   scaling and clipping. It is used only for GUI display or optional PNG export.
-3. **QC visualization** — the rotated analysis crop, normalized profile,
-   detected candidates, and annotations produced after analysis.
+### Source and QC preview
 
-Preview generation does not mutate the raw array and preview PNG files are
-never read back into the Raw TXT analysis pipeline.
+![Source image and full QC profile](docs/images/qc_preview.png)
 
-The Source preview and QC preview tabs provide synchronized layer navigation
-with Previous/Next, Left/Right, Home/End, and a current-layer indicator. Their
-viewers preserve aspect ratio and support bounded 10–800% zoom, mouse-wheel
-zooming, panning while enlarged, Fit to window, 100%, and double-click Fit.
-The full QC PNG can also be opened in a separate scalable window. These display
-operations do not resave or modify source images.
+### QC detail view
 
-## Exploratory depth analysis
+![Zoomed QC profile with navigation and zoom controls](docs/images/qc_zoom.png)
 
-Depth analysis is an **exploratory feature**, not a validated reconstruction of
-the evolution of individual physical domains. It summarizes independent
-detections at each configured layer position and requires scientific
-validation.
+### Candidate dark-interval distribution by depth
 
-The depth summary shows mean candidate bright-band width, mean candidate dark-
-interval width, mean period, detection counts, and OK/CHECK status. CHECK
-layers use separate markers and break connecting lines. The distribution plot
-shows every candidate dark-interval width at each z together with its median,
-interquartile range, and observation count. Intervals from different layers
-are never joined into B1(z), B2(z), or B3(z) series.
+![Candidate dark-interval observations, median, IQR, and count at each depth](docs/images/depth_distribution.png)
 
-## Layer coordinates and preflight
+Intervals are independent observations at each depth and are not followed as physical identities between layers.
 
-Natural sorting gives `1, 2, 10`. When numbers are available, the last numeric
-group in each basename is extracted and:
+## 7. Installation
 
-```text
-layer_index = source_number - minimum_source_number
-```
-
-For increasing z, `z_i = z0 + layer_index × step`; for decreasing z,
-`z_i = z0 - layer_index × step`. Internal coordinates are micrometres.
-Therefore a missing source number reserves its coordinate rather than silently
-shifting later layers. Missing or unextractable numbering requires explicit GUI
-confirmation, and the confirmed table is stored in `series_config.json`.
-
-TXT validation rejects empty files, nonnumeric or ragged content, matrices
-smaller than 2 × 2, NaN/infinity, and shapes that differ from the series mode.
-Invalid files are displayed in the GUI, excluded from analysis, and recorded in
-`import_errors.csv`. A small outlier is never resized to the common shape.
-
-## Optional conversion exports
-
-The two options are disabled by default:
-
-- **Preview PNG:** 8-bit grayscale, linear 1st/99th percentile normalization,
-  display only.
-- **Float TIFF stack:** valid layers in explicit layer order, `float32`, axes
-  `ZYX`, no contrast enhancement and no 8-bit quantization.
-
-`imported_layers.csv` preserves filename, source number, layer index, z, shape,
-source minimum/maximum, SHA-256, and import status.
-
-## Legacy ImageJ workflow
-
-The old workflow converted TXT data into contrast-enhanced 8-bit PNG/TIFF using
-ImageJ Enhance Contrast. Raw TXT mode instead analyzes the original
-floating-point matrices. Results from the two workflows may differ, and their
-equivalence has not been verified.
-
-The preview PNG implementation is not claimed to be bitwise or scientifically
-equivalent to ImageJ. This project does not approximate ImageJ Enhance Contrast
-in the primary analysis mode. A separate experimental compatibility converter
-could be evaluated later, but it is outside this version.
-
-## Installation and GUI
-
-- Python 3.10 or newer
-- NumPy, Pillow, SciPy, Matplotlib, PySide6, tifffile
-- pytest for tests
+Python 3.10 or newer is required.
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 python -m pip install -e ".[test]"
+```
+
+Dependencies are declared in `pyproject.toml`: NumPy, Pillow, SciPy, Matplotlib, PySide6, tifffile, and pytest for tests.
+
+## 8. Running the GUI
+
+```powershell
 python run_gui.py
 ```
 
-Dependencies are installed into the environment once. Application startup does
-not run pip.
+After installation, the console entry point is also available:
 
-## Results
+```powershell
+shg-series-analyzer
+```
 
-Every run creates a new `run_timestamp_uuid` directory containing:
+Application startup never installs packages.
+
+## 9. Synthetic demo
+
+The repository contains a deterministic synthetic series with ten valid layers and two intentional negative TXT examples. The data generator uses a fixed seed and records construction parameters in `ground_truth.json`.
+
+```powershell
+python demo/run_demo.py --mode raw
+python demo/run_demo.py --mode legacy
+```
+
+The raw demo also verifies optional preview PNG and `float32` TIFF export. Demo outputs are written to ignored `demo/run_outputs*` directories.
+
+## 10. Input TXT format
+
+The supported portfolio format is:
+
+- UTF-8 text without a header;
+- one numeric matrix row per line;
+- whitespace-delimited, dot-decimal values;
+- rectangular two-dimensional shape;
+- finite values only;
+- natural filename ordering such as `layer_001.txt`, `layer_002.txt`, `layer_010.txt`.
+
+Raw TXT files are decoded completely and parsed to `float64`. They are passed to `analyze_array()` without conversion to PNG or `uint8`.
+
+## 11. Output files
+
+Each run creates a unique `run_timestamp_uuid` directory containing:
 
 ```text
 summary.csv
@@ -205,46 +148,75 @@ import_errors.csv
 series_config.json
 run_manifest.json
 qc/*.png
-plots/*.png
-previews/*.png                 optional
-source_stack_float32.tif       optional
+plots/depth_summary.png
+plots/dark_interval_distribution_by_depth.png
+previews/*.png                 # optional display copies
+source_stack_float32.tif       # optional, axes ZYX
 ```
 
-The manifest records source type, detected TXT format, source and working
-dtypes, common matrix shape, preview settings, TIFF dtype/axes, dependency
-versions, processing parameters, portable source paths, and before/after source
-hashes.
+CSV values retain candidate terminology. Existing measurement fields are not presented as scientifically validated physical quantities.
 
-## Synthetic demos and tests
+## 12. Project architecture
 
-The generator creates ten deterministic float TXT layers with periodic bright
-features, depth-dependent parameters, noise, fixed seed, and
-`ground_truth.json`. It also creates a nonnumeric file, a 3 × 3 wrong-shape
-file, a gap variant, and optional synthetic PNG files for legacy tests. None are
-derived from experimental data.
+```text
+src/shg_domain_analyzer/
+├── models.py           configuration and result dataclasses
+├── config.py           portable JSON and coordinate mapping
+├── image_io.py         TXT/image import, preflight, and hashing
+├── processing.py       detector mathematics
+├── measurements.py     shared analyze_array() measurement pipeline
+├── visualization.py    display, QC, and exploratory depth plots
+├── export.py           CSV, manifest, PNG, and TIFF exports
+└── gui/
+    ├── image_viewer.py interactive zoom/pan viewer
+    ├── main_window.py  PySide6 workflow
+    └── worker.py       background processing and cancellation
+```
+
+Both source modes enter the same analysis function:
+
+```text
+TXT → read_txt_matrix() → float64 ─┐
+                                   ├→ analyze_array()
+PNG/TIFF → read_gray() → float32 ──┘
+```
+
+## 13. Testing
 
 ```powershell
-python demo/run_demo.py --mode raw
-python demo/run_demo.py --mode legacy
 python -m pytest
 ```
 
-Synthetic comparisons test software regression, not physical accuracy.
+Tests cover configuration, natural ordering, gap-preserving coordinates, strict TXT validation, detector software regression, complete raw and legacy pipelines, unchanged source hashes, float TIFF metadata, GUI navigation, zoom behavior, and scientifically neutral depth visualizations.
 
-## Current limitations
+Synthetic agreement tests validate software behavior only; they do not establish scientific accuracy.
 
-- Bright-band identity and physical meaning are not validated.
-- `OK` is an internal structural check, not an accuracy guarantee.
-- B indices identify left-to-right order only within one frame.
-- Exploratory depth plots are not a confirmed reconstruction of individual
-  domain evolution.
-- There is no inter-layer registration, uncertainty propagation, confidence
-  interval, or expert-agreement metric.
-- Mean transverse profiles can lose curved, branching, or heterogeneous detail.
+## 14. Scientific limitations
+
+- The detector has not been validated against expert annotation or an independent measurement method.
+- `OK` is an internal structural status, not an accuracy guarantee.
+- Bright-band identity and physical interpretation are not established.
+- Left-to-right interval labels apply only inside one frame.
+- Exploratory depth plots do not reconstruct the evolution of individual physical domains.
+- There is no inter-layer registration, uncertainty propagation, confidence interval, or expert-agreement metric.
+- Mean transverse profiles can hide curved, branching, or heterogeneous structures.
 - Fixed preprocessing and detection thresholds can bias results.
-- TXT import currently targets the inspected headerless, dot-decimal,
-  whitespace-delimited format; locale decimal commas and headers are rejected.
-- Cancellation occurs between layers, not inside rotation search for one layer.
-- A filename's last numeric group may be ambiguous and must be reviewed.
-- Saved paths can only remain relative across locations on the same drive.
-- No license is included at this stage.
+- The Raw TXT workflow is not claimed to be equivalent to ImageJ processing.
+
+## 15. Privacy and data policy
+
+This repository contains no real experimental matrices, images, sample identifiers, measurements, laboratory documents, or user result directories. Included demo files are generated synthetically and marked accordingly.
+
+Local configurations and generated results are excluded by `.gitignore`. See `SECURITY_AND_DATA_POLICY.md` for repository rules.
+
+## 16. Legacy PNG/TIFF mode
+
+Legacy mode accepts already converted PNG/TIFF inputs through Pillow and routes their grayscale floating-point arrays to the shared detector. It exists for compatibility with previously prepared image workflows.
+
+The repository does not claim that legacy conversion is equivalent to the Raw TXT path or to any external contrast-enhancement workflow.
+
+## 17. Current status: v0.1
+
+Version `v0.1` is a portfolio-ready software baseline with direct TXT import, portable configuration, reproducible synthetic demos, desktop QC review, safe exports, and automated tests.
+
+The exploratory detector remains subject to independent scientific validation. No license is included because public licensing rights have not yet been confirmed.

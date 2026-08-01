@@ -21,6 +21,7 @@ test = ["pytest>=8.0"]
 
 [project.scripts]
 shg-domain-analyzer = "shg_domain_analyzer.gui.main_window:main"
+shg-series-analyzer = "shg_domain_analyzer.gui.main_window:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
