@@ -87,6 +87,13 @@ Intervals are independent observations at each depth and are not followed as phy
 
 ### Windows installation
 
+Для временного запуска из ZIP без навыков Python:
+
+1. Скачайте ZIP проекта и распакуйте его.
+2. Один раз установите Python 3.10 или новее.
+3. Запустите `FIRST_RUN.bat`.
+4. В дальнейшем запускайте `START_SHG_ANALYZER.bat`.
+
 Most Windows users should download `SHG-Series-Analyzer-Setup-0.1.0.exe`, install it for the current user, and launch **SHG Series Analyzer** from the Start menu. Python is not required for the installer or portable package. See [Windows installation](docs/WINDOWS_INSTALL.md) for the standard and portable instructions, checksum verification, and the unsigned-build SmartScreen warning.
 
 The Python commands below are intended for developers.
