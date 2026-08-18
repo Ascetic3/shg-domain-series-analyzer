@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $pythonPath = Join-Path $repoRoot ".venv\Scripts\python.exe"
-$version = "0.1.0"
+$version = "0.1.1"
 $distDirectory = Join-Path $repoRoot "dist\SHGSeriesAnalyzer"
 $portableExe = Join-Path $distDirectory "SHGSeriesAnalyzer.exe"
 $releaseDirectory = Join-Path $repoRoot "release"
@@ -81,8 +81,8 @@ if (-not (Test-Path -LiteralPath $pythonPath)) {
 }
 
 $pyproject = Get-Content -Raw -LiteralPath (Join-Path $repoRoot "pyproject.toml")
-if ($pyproject -notmatch '(?m)^version\s*=\s*"0\.1\.0"\s*$') {
-    throw "pyproject.toml version must be 0.1.0 for this release build."
+if ($pyproject -notmatch '(?m)^version\s*=\s*"0\.1\.1"\s*$') {
+    throw "pyproject.toml version must be 0.1.1 for this release build."
 }
 
 foreach ($directory in @("build", "dist", "release")) {
