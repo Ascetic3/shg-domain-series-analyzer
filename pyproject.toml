@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shg-domain-analyzer"
-version = "0.1.0"
+version = "0.1.1"
 description = "Portfolio GUI for neutral measurement of periodic bright bands and dark intervals."
 requires-python = ">=3.10"
 dependencies = [

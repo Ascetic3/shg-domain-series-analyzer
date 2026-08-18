@@ -1,5 +1,5 @@
 #define MyAppName "SHG Series Analyzer"
-#define MyAppVersion "0.1.0"
+#define MyAppVersion "0.1.1"
 #define MyAppExeName "SHGSeriesAnalyzer.exe"
 
 [Setup]
@@ -13,17 +13,22 @@ PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\release
-OutputBaseFilename=SHG-Series-Analyzer-Setup-0.1.0
+OutputBaseFilename=SHG-Series-Analyzer-Setup-0.1.1
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
 Uninstallable=yes
 CloseApplications=yes
 RestartApplications=no
+LanguageDetectionMethod=none
+UsePreviousLanguage=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
+
+[INI]
+Filename: "{userappdata}\SHG Series Analyzer\settings.ini"; Section: "application"; Key: "language"; String: "{language}"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked

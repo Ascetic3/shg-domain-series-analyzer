@@ -45,6 +45,7 @@ from ..models import (
 )
 from ..visualization import preview_to_uint8
 from .image_viewer import FullSizeImageDialog, ImageViewer, ZoomControls
+from .localization import install_application_language, load_application_language
 from .worker import AnalysisWorker
 
 
@@ -943,6 +944,7 @@ def main(argv: list[str] | None = None) -> int:
     qt_arguments = [sys.argv[0], *(argument for argument in arguments if argument != "--smoke-test")]
     app = QApplication.instance() or QApplication(qt_arguments)
     app.setApplicationName("Bright-band series analyzer")
+    install_application_language(app, load_application_language())
     window = MainWindow()
     window.show()
     if smoke_test:

@@ -5,7 +5,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
-$version = "0.1.0"
+$version = "0.1.1"
 $portableExe = Join-Path $repoRoot "dist\SHGSeriesAnalyzer\SHGSeriesAnalyzer.exe"
 $setupPath = Join-Path $repoRoot "release\SHG-Series-Analyzer-Setup-$version.exe"
 $testParent = Join-Path $repoRoot ".test_tmp"
